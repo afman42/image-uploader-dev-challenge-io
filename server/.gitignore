@@ -1,0 +1,4 @@
+node_modules
+public
+prisma/dev.db
+prisma/migrations
