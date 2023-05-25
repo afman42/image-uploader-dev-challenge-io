@@ -12,13 +12,17 @@ export const apiPost = async (data: FormData, isUpload: Ref<Boolean>, uploadPerc
           "Content-Type": "multipart/form-data",
         },
         onUploadProgress: function(progressEvent: AxiosProgressEvent){
+            // @ts-ignore
             uploadPercentage.value = Math.round((progressEvent.loaded / progressEvent?.total ) * 100 );
         },
-    }).then((res) => { 
-        isUpload.value = false
+    }).then((res) => {
         return res
     }).catch((er) => { 
         isUpload.value = true
         console.log(er)
-    }).finally(() => isUpload.value = false)
+    })
+}
+
+export const apiGetID = async (id: string) => {
+    return await api.get(`/view/${id}`).then((res) => res).catch((er) => console.log(er))
 }

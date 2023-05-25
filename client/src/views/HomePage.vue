@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import ProgressBar from "../components/ProgressBar.vue";
+import { useRouter } from "vue-router";
 import { apiPost } from "../api";
 import Image from "../assets/image.svg"
 import { ref } from "vue"
+import { AxiosResponse } from "axios";
 let isUpload = ref(false)
 let percentageUpload = ref(0)
+let router = useRouter()
 
 const filesChange = async (ev: any) => {
     const formData = new FormData();
     const fileList = ev.files
     if (!fileList.length) return;
     formData.append("name", fileList[0],fileList[0].name);
-    const axp = await apiPost(formData, isUpload,percentageUpload)
-    console.log(axp)
+    const axp = await apiPost(formData, isUpload,percentageUpload) as AxiosResponse
+    router.push(`/view/${axp.data.id}`)
 }
 </script>
 

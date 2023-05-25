@@ -13,10 +13,12 @@
     "@fastify/cors": "^8.2.1",
     "@fastify/static": "^6.10.1",
     "@prisma/client": "^4.14.1",
+    "date-fns": "^2.30.0",
     "fastify": "^4.17.0",
     "fastify-multer": "^2.0.3"
   },
   "devDependencies": {
+    "@types/date-fns": "^2.6.0",
     "@types/node": "^20.2.3",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"

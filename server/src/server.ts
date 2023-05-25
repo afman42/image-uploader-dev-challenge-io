@@ -1,12 +1,17 @@
-import Fastify, { FastifyReply, FastifyRequest, RouteOptions }   from "fastify";
+import Fastify, { FastifyReply, FastifyRequest }   from "fastify";
 import path from "node:path"
 import multer  from 'fastify-multer'
 import { prisma } from "./utils";
 import { File } from "fastify-multer/lib/interfaces";
 import cors from '@fastify/cors'
+import { format } from "date-fns";
+import indoLocale from "date-fns/locale/id"
 
 function fileName(file: File){
-  return file.fieldname + '-' + Date.now() + "." + file.mimetype.split("/")[1]
+  const formattedDate = format(Date.now(), 'dd-MM-YYY-hh:mm', {
+    locale: indoLocale
+  });
+  return file.fieldname + '-' + formattedDate + "." + file.mimetype.split("/")[1]
 }
 
 const storage = multer.diskStorage({
@@ -34,6 +39,23 @@ function buildServer() {
   server.route({
     method: "POST",
     url: "/upload",
+    schema: {
+      response: {
+        "200": {
+          type: "object",
+          properties: {
+            id: { type: "number" },
+            name: { type: "string" }
+          }
+        },
+        "500": {
+          type: "object",
+          properties: {
+            data: { type: "string" }
+          }
+        }
+      }
+    },
     preHandler: upload.single("name"),
     handler: async function(request: FastifyRequest, reply: FastifyReply){
         try {

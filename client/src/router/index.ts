@@ -10,7 +10,11 @@ const routes: RouteRecordRaw[] = [
         name: "viewID",
         path: "/view/:id",
         component: () => import("../views/ViewIDPage.vue")
-    }
+    },
+    {   path: '/:pathMatch(.*)*', 
+        name: 'NotFound', 
+        component: () => import('../views/NotFound.vue') 
+    },
 ]
 
 const router = createRouter({
