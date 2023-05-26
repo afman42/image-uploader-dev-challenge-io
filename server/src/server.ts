@@ -6,6 +6,8 @@ import { File } from "fastify-multer/lib/interfaces";
 import cors from '@fastify/cors'
 import { format } from "date-fns";
 import indoLocale from "date-fns/locale/id"
+import { ZodError, z } from "zod";
+import { File } from "node:buffer";
 
 function fileName(file: File){
   const formattedDate = format(Date.now(), 'dd-MM-YYY-hh:mm', {
@@ -53,13 +55,39 @@ function buildServer() {
           properties: {
             data: { type: "string" }
           }
+        },
+        "422": {
+          type: "object",
+          properties: {
+            _errors: { type: "object" },
+            name: { _errors: { type: "array" } }
+          }
         }
       }
     },
     preHandler: upload.single("name"),
     handler: async function(request: FastifyRequest, reply: FastifyReply){
-        try {
+        
+      try {
           const file = (request as any).file as File
+          const MAX_FILE_SIZE = 500000;
+          const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+          const fileSchema = z.object({
+            name: z
+              .any()
+              .refine((file) => file?.size <= MAX_FILE_SIZE, `Max image size is 5MB.`)
+              .refine(
+                (file) => ACCEPTED_IMAGE_TYPES.includes(file?.mimetype),
+                "Only .jpg, .jpeg, .png and .webp formats are supported."
+              )
+          })
+          const resError = fileSchema.safeParse({ name: file })
+          if(!resError.success) {
+            const formatted = resError.error.format();
+            reply.code(422).send(formatted)
+          }
+
           const res = await prisma.photos.create({
               data: {
                   name: fileName(file)
@@ -69,6 +97,8 @@ function buildServer() {
           reply.code(200).send(res) 
         } catch (error) {
           reply.code(500).send({ data: "Something Went Wrong"})
+          // reply.code(500).send(error)
+          
           console.log(error)
         }
     }
