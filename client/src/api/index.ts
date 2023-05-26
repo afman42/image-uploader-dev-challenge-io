@@ -5,9 +5,13 @@ const api = axios.create({
     baseURL: "http://localhost:3000"
 })
 
-export const apiPost = async (data: FormData, isUpload: Ref<Boolean>, uploadPercentage: Ref<Number>) => {
+export const apiPost = async (data: any | DragEvent, isUpload: Ref<Boolean>, uploadPercentage: Ref<Number>, errResponse: Ref<{ code: number, message: string }>) => {
     isUpload.value = true
-    return await api.post("/upload", data, {
+    const formData = new FormData();
+    const fileList = data
+    if (!fileList.length) return;
+    formData.append("name", fileList[0],fileList[0].name);
+    return await api.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -17,9 +21,13 @@ export const apiPost = async (data: FormData, isUpload: Ref<Boolean>, uploadPerc
         },
     }).then((res) => {
         return res
-    }).catch((er) => { 
-        isUpload.value = true
+    }).catch((er: any) => { 
+        isUpload.value = false
         console.log(er)
+        if (er.response) {
+            errResponse.value.code = er.response.status
+            errResponse.value.message = er.response.data
+        }
     })
 }
 

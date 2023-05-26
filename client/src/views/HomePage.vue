@@ -8,23 +8,61 @@ import { AxiosResponse } from "axios";
 let isUpload = ref(false)
 let percentageUpload = ref(0)
 let router = useRouter()
+let dragCss = ref(false)
+let errResponse = ref({
+    code: 0,
+    message: ""
+})
 
 const filesChange = async (ev: any) => {
-    const formData = new FormData();
-    const fileList = ev.files
-    if (!fileList.length) return;
-    formData.append("name", fileList[0],fileList[0].name);
-    const axp = await apiPost(formData, isUpload,percentageUpload) as AxiosResponse
+    const axp = await apiPost(ev.files, isUpload,percentageUpload,errResponse) as AxiosResponse
+    router.push(`/view/${axp.data.id}`)
+}
+const preventAndDragDrop = (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation()
+}
+const droppedFiles = async (e: DragEvent) => {
+    const axp = await apiPost(e.dataTransfer?.files as FileList, isUpload,percentageUpload, errResponse) as AxiosResponse
     router.push(`/view/${axp.data.id}`)
 }
 </script>
 
 <template>
+    <div v-if="errResponse.message != ''">
+        {{ errResponse.code }} {{  errResponse.message }}
+    </div>
     <ProgressBar v-if="isUpload" :number-percentage="percentageUpload" />
     <div v-else class="w-4/12 bg-[#FFF] rounded-lg drop-shadow-lg p-8 text-center">
         <h1 class="font-medium font-poppins text-lg text-[#828282]">Upload your image</h1>
         <h6 class="font-medium font-poppins text-xs text-[#828282] my-4">File should be Jpeg, Png,...</h6>
-        <div class="border-2 rounded-lg border-dashed border-blue-100 bg-blue-50 flex justify-center items-center flex-col py-8">
+        <div 
+            @drag="e => preventAndDragDrop(e)"
+            @dragstart="e => preventAndDragDrop(e)"  
+            @dragend="e => {
+                preventAndDragDrop(e)
+                dragCss = false
+            }"
+            @dragover="e => {
+                preventAndDragDrop(e)
+                dragCss = true
+            }"
+            @dragenter="e => {
+                preventAndDragDrop(e)
+                dragCss = true
+            }"
+            @dragleave="e => {
+                preventAndDragDrop(e)
+                dragCss = false
+            }"
+            @drop="e => {
+                preventAndDragDrop(e)
+                dragCss = false
+                droppedFiles(e)
+            }"
+            class="border-4 rounded-lg border-dashed flex justify-center items-center flex-col py-8"
+            :class="[ dragCss ? 'border-red-100 bg-[#FFF]' : 'border-blue-100 bg-blue-50' ]"
+            >
             <img :src="Image" />
             <h1 class="text-[#BDBDBD] font-medium text-lg pt-8">Drag & Drop your image here</h1>
         </div>
