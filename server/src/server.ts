@@ -1,13 +1,14 @@
 import Fastify, { FastifyReply, FastifyRequest }   from "fastify";
 import path from "node:path"
+import fs from "node:fs"
 import multer  from 'fastify-multer'
 import { prisma } from "./utils";
 import { File } from "fastify-multer/lib/interfaces";
 import cors from '@fastify/cors'
 import { format } from "date-fns";
 import indoLocale from "date-fns/locale/id"
-import { ZodError, z } from "zod";
-import { File } from "node:buffer";
+import { z } from "zod";
+
 
 function fileName(file: File){
   const formattedDate = format(Date.now(), 'dd-MM-YYY-hh:mm', {
@@ -83,9 +84,12 @@ function buildServer() {
               )
           })
           const resError = fileSchema.safeParse({ name: file })
-          if(!resError.success) {
+          if(!resError.success && file) {
+              fs.unlink(
+                    path.join(file.path as string),
+                       (err) => console.log(err));
             const formatted = resError.error.format();
-            reply.code(422).send(formatted)
+            return reply.code(422).send(formatted)
           }
 
           const res = await prisma.photos.create({
@@ -94,11 +98,9 @@ function buildServer() {
               }
           })
 
-          reply.code(200).send(res) 
+          return reply.code(200).send(res)
         } catch (error) {
           reply.code(500).send({ data: "Something Went Wrong"})
-          // reply.code(500).send(error)
-          
           console.log(error)
         }
     }
