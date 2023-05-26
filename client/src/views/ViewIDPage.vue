@@ -2,6 +2,7 @@
 import { onMounted, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import { apiGetID } from '../api';
+import { Icon } from '@iconify/vue';
 const route = useRoute();
 const getImg = reactive<{ name: string, id: number, copyClipboard: () => void }>({
     id: 0,
@@ -20,8 +21,9 @@ onMounted(async () => {
 
 <template>
     <div v-if="getImg.name != ''" class="w-4/12 bg-[#FFF] rounded-lg drop-shadow-lg p-8 space-y-4 text-center">
-        <!-- <Icon name="mdi:check-circle" color="green" size="35px" /> -->
-        <h1 class="text-xl font-poppins font-medium">Checklist</h1>
+        <div class="flex justify-center w-full">
+            <Icon icon="mdi:check-circle" style="color:green; font-size: 35px;" />
+        </div>
         <h1 class="font-poppins font-medium text-2xl">Uploaded Successfully!</h1>
         <img :src="`http://localhost:3000${getImg.name}`" class="rounded-lg w-full h-52" />
         <div class="h-12 w-full bg-blue-50 flex flex-row items-center pl-2 rounded-lg">
