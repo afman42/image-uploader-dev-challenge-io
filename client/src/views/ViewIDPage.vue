@@ -31,4 +31,8 @@ onMounted(async () => {
             <button class="text-[#FFF] w-24 bg-[#2F80ED] h-full text-xs rounded-lg" @click="getImg.copyClipboard">Copy Link</button>
         </div>
     </div>
+    <div v-else class="w-4/12 bg-[#FFF] rounded-lg p-4 drop-shadow-lg flex justify-center flex-col items-center">
+        <h1 class="text-3xl font-poppins font-medium">Not Found....</h1>
+        <RouterLink to="/" class="w-28 h-8 flex items-center justify-center rounded-lg bg-blue-500 text-[#FFF] hover:text-black hover hover:border-2 hover:border-blue-500 hover:bg-[#FFF]">Back</RouterLink>
+    </div>
 </template>

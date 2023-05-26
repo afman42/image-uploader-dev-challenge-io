@@ -9,13 +9,9 @@ let isUpload = ref(false)
 let percentageUpload = ref(0)
 let router = useRouter()
 let dragCss = ref(false)
-let errResponse = ref({
-    code: 0,
-    message: ""
-})
 
 const filesChange = async (ev: any) => {
-    const axp = await apiPost(ev.files, isUpload,percentageUpload,errResponse) as AxiosResponse
+    const axp = await apiPost(ev.files, isUpload,percentageUpload) as AxiosResponse
     router.push(`/view/${axp.data.id}`)
 }
 const preventAndDragDrop = (e: DragEvent) => {
@@ -23,15 +19,12 @@ const preventAndDragDrop = (e: DragEvent) => {
     e.stopPropagation()
 }
 const droppedFiles = async (e: DragEvent) => {
-    const axp = await apiPost(e.dataTransfer?.files as FileList, isUpload,percentageUpload, errResponse) as AxiosResponse
+    const axp = await apiPost(e.dataTransfer?.files as FileList, isUpload,percentageUpload) as AxiosResponse
     router.push(`/view/${axp.data.id}`)
 }
 </script>
 
 <template>
-    <div v-if="errResponse.message != ''">
-        {{ errResponse.code }} {{  errResponse.message }}
-    </div>
     <ProgressBar v-if="isUpload" :number-percentage="percentageUpload" />
     <div v-else class="w-4/12 bg-[#FFF] rounded-lg drop-shadow-lg p-8 text-center">
         <h1 class="font-medium font-poppins text-lg text-[#828282]">Upload your image</h1>
