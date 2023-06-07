@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsnd --respawn --transpile-only --exit-child src/app.ts"
+    "dev": "tsnd --respawn --transpile-only --exit-child src/app.ts",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write ."
   },
   "keywords": [],
   "author": "",
@@ -21,6 +23,7 @@
   "devDependencies": {
     "@types/date-fns": "^2.6.0",
     "@types/node": "^20.2.3",
+    "prettier": "^2.8.8",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
   }
