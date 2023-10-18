@@ -5,13 +5,13 @@ import { apiPost } from "../api";
 import Image from "../assets/image.svg"
 import { ref } from "vue"
 import { AxiosResponse } from "axios";
-let isUpload = ref(false)
-let percentageUpload = ref(0)
+import store from "../store"
 let router = useRouter()
 let dragCss = ref(false)
+let { isUpload, uploadPercentage } = store()
 
 const filesChange = async (ev: any) => {
-    const axp = await apiPost(ev.files, isUpload,percentageUpload) as AxiosResponse
+    const axp = await apiPost(ev.files) as AxiosResponse
     router.push(`/view/${axp.data.id}`)
 }
 const preventAndDragDrop = (e: DragEvent) => {
@@ -19,13 +19,13 @@ const preventAndDragDrop = (e: DragEvent) => {
     e.stopPropagation()
 }
 const droppedFiles = async (e: DragEvent) => {
-    const axp = await apiPost(e.dataTransfer?.files as FileList, isUpload,percentageUpload) as AxiosResponse
+    const axp = await apiPost(e.dataTransfer?.files as FileList) as AxiosResponse
     router.push(`/view/${axp.data.id}`)
 }
 </script>
 
 <template>
-    <ProgressBar v-if="isUpload" :number-percentage="percentageUpload" />
+    <ProgressBar v-if="isUpload" :number-percentage="uploadPercentage" />
     <div v-else class="w-4/12 bg-[#FFF] rounded-lg drop-shadow-lg p-8 text-center">
         <h1 class="font-medium font-poppins text-lg text-[#828282]">Upload your image</h1>
         <h6 class="font-medium font-poppins text-xs text-[#828282] my-4">File should be Jpeg, Png,...</h6>
